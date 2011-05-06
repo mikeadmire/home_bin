@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+# Command line app to test servers
+# Author: Mike Admire <mike@dotfiretech.com>
+
+require 'rubygems'
+require 'thor'
+require 'dalli'
+require 'benchmark'
+
+class ServerTest < Thor
+
+  desc 'memcache [-h hostname] [-n # of times]',
+    'Run a series of set and get commands against a Memcached server and provide basic benchmarking'
+  method_options %w( host -h ) => 'localhost'
+  method_options %w( number -n ) => 50
+  def memcache
+
+    # command line options
+    host = options[:host]
+    number = options[:number]
+
+    memcache_test = MemcacheTest.new(host)
+    key = memcache_test.generate_key
+    value = TestData.new
+
+    time = Benchmark.measure do
+      number.times do
+        memcache_test.set(key, value)
+        memcache_test.get(key)
+      end
+    end
+    puts "Benchmark results for #{number} actions: %.5f seconds" % time.real
+  end
+
+end
+
+class MemcacheTest
+
+  def initialize(host)
+    @memcache = Dalli::Client.new("#{host}:11211")
+  end
+
+  def generate_key
+    key = "mike#{Time.now.strftime("%s%L")}"
+  end
+
+  def set(key, value)
+    @memcache.set(key, Marshal.dump(value))
+  end
+
+  def get(key)
+    Marshal.load(@memcache.get(key))
+  end
+
+end
+
+class TestData
+  attr_accessor :name, :website, :city, :state
+  def initialize(name = 'Test Data', website = 'http://example.com', city = 'Test City', state = 'Test State')
+    @name = name
+    @website = website
+    @city = city
+    @state = state
+  end
+end
+
+
+ServerTest.start
