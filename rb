@@ -16,7 +16,6 @@ end
 EOS
 
   desc "sin PROJECT", "setup the directory structure for a new Sinatra project"
-#  method_options :forcefully => :boolean
   def sin(name)
     FileUtils.mkdir "#{name}"
     FileUtils.cd "#{name}"
@@ -79,13 +78,6 @@ EOS
     File.open('Gemfile', 'w') { |f| f.write "source 'http://rubygems.org'\n\ngem 'rake'\ngem 'rspec'" }
   end
 ######## </RubyGems> ########
-
-
-  desc "hello", "say hello"
-  def hello
-    puts "Hello"
-  end
-
 
 end
 
