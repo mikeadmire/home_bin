@@ -4,6 +4,7 @@ require 'thor'
 require 'fileutils'
 require 'dalli'
 require 'benchmark'
+require 'colorize'
 
 class Rb < Thor
 
@@ -54,7 +55,11 @@ class Rb < Thor
         memcache_test.get(key)
       end
     end
-    puts "Benchmark results for #{number} actions: %.5f seconds" % time.real
+    puts "Benchmark results for host: " + "#{host}".colorize(:cyan)
+    print "#{number}".colorize(:cyan)
+    print " actions completed in: " 
+    print "%.5f".colorize(:yellow) % time.real 
+    puts " seconds"
   end
 
 end
