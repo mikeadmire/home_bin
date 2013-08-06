@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'ostruct'
 require 'thor'
 require 'fileutils'
 require 'dalli'
@@ -47,7 +48,7 @@ class Rb < Thor
 
     memcache_test = MemcacheTest.new(host)
     key = memcache_test.generate_key
-    value = TestData.new
+    value = GetTestData.new
 
     time = Benchmark.measure do
       number.times do
@@ -63,6 +64,9 @@ class Rb < Thor
   end
 
 end
+
+
+private
 
 class MemcacheTest
 
@@ -84,14 +88,13 @@ class MemcacheTest
 
 end
 
-class TestData
-  attr_accessor :name, :website, :city, :state
-  def initialize(name = 'Test Data', website = 'http://example.com', city = 'Test City', state = 'Test State')
-    @name = name
-    @website = website
-    @city = city
-    @state = state
-  end
+class GetTestData
+  data = OpenStruct.new
+  data.name = 'Test Data'
+  data.website = 'http://www.example.com/'
+  data.city = 'Test City'
+  data.state = 'Anywhere State'
+  data
 end
 
 
