@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'ostruct'
 require 'thor'
 require 'fileutils'
-require 'dalli'
-require 'benchmark'
+require 'memcache_check'
 require 'colorize'
 
 class Rb < Thor
@@ -46,56 +44,18 @@ class Rb < Thor
     host = options[:host]
     number = options[:number]
 
-    memcache_test = MemcacheTest.new(host)
-    key = memcache_test.generate_key
-    value = GetTestData.new
+    memcheck = MemcacheCheck::Checker.new(host)
+    passes, fails, time = memcheck.start(number)
 
-    time = Benchmark.measure do
-      number.times do
-        memcache_test.set(key, value)
-        memcache_test.get(key)
-      end
-    end
     puts "Benchmark results for host: " + "#{host}".colorize(:cyan)
     print "#{number}".colorize(:cyan)
-    print " actions completed in: " 
+    print " checks run in: " 
     print "%.5f".colorize(:yellow) % time.real 
     puts " seconds"
+    puts "#{passes}".colorize(:cyan) + " passes"
+    puts "#{fails}".colorize(:cyan) + " failures"
   end
 
 end
-
-
-private
-
-class MemcacheTest
-
-  def initialize(host)
-    @memcache = Dalli::Client.new("#{host}:11211")
-  end
-
-  def generate_key
-    key = "mike#{Time.now.strftime("%s%L")}"
-  end
-
-  def set(key, value)
-    @memcache.set(key, Marshal.dump(value))
-  end
-
-  def get(key)
-    Marshal.load(@memcache.get(key))
-  end
-
-end
-
-class GetTestData
-  data = OpenStruct.new
-  data.name = 'Test Data'
-  data.website = 'http://www.example.com/'
-  data.city = 'Test City'
-  data.state = 'Anywhere State'
-  data
-end
-
 
 Rb.start
