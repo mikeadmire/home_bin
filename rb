@@ -29,11 +29,6 @@ class Rb < Thor
     end
   end
 
-  desc "gem PROJECT", "Deprecated. Use `bundle gem PROJECT`."
-  def gem(name)
-    `bundle gem #{name}`
-  end
-
   desc 'memcachetest [-h hostname] [-n # of times]',
     'Run a series of set and get commands against a Memcached server and provide basic benchmarking'
   method_options %w( host -h ) => 'localhost'
