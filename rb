@@ -7,6 +7,12 @@ require 'colorize'
 
 class Rb < Thor
 
+  no_commands do
+    def highlight(mytext)
+      puts "\e[41m#{mytext}\e[0m"
+    end
+  end
+
   desc "sinatra PROJECT", "setup the directory structure for a new Sinatra project"
   def sinatra(name)
     FileUtils.mkdir "#{name}"
@@ -51,6 +57,25 @@ class Rb < Thor
     puts "#{fails}".colorize(:cyan) + " failures"
   end
 
+  desc 'updateall', 'Update Homebrew and other stuff'
+  def updateall
+    highlight "brew update"
+    `brew update`
+    highlight "brew upgrade"
+    `brew upgrade`
+    highlight "brew cask upgrade"
+    `brew cask upgrade`
+    highlight "brew upgrade --cleanup"
+    `brew upgrade --cleanup`
+    highlight "brew cleanup"
+    `brew cleanup`
+    highlight "brew doctor"
+    `brew doctor`
+    highlight "update-dotfiles"
+    `curl https://raw.githubusercontent.com/mikeadmire/dotfiles/master/install.sh -o - | sh`
+    highlight "update-home_bin"
+    `curl https://raw.githubusercontent.com/mikeadmire/home_bin/master/install.sh -o - | sh`
+  end
 end
 
 Rb.start
